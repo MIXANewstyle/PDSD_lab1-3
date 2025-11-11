@@ -72,7 +72,6 @@ int main() {
 
     cout << "\n--- Тест F14 (Симметричная разность) ---" << endl;
     Node* setSymDiff = F14_SymmetricDifference(setA, setB);
-    // *** ИЗМЕНЕНИЕ ЗДЕСЬ ***
     cout << "  Симм. разность (A и B): " << F7_GetSetAsString(setSymDiff, ',') << endl;
 
 
