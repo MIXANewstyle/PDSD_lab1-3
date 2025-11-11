@@ -1,136 +1,92 @@
-﻿#include "Lab1_header_Ushakov.h"
-#include <iostream> // Для вывода ошибки в F5
+﻿#include <iostream>
+#include <string>
+#include <clocale>      // для setlocale
+#include <random>       // для генерации размера
+#include <iomanip>      // для boolalpha (вывод true/false)
 
-// F1. Создание пустого множества
-Node* F1_CreateEmptySet() {
-    return nullptr; // Пустое множество - это просто NULL-указатель
-}
+// Подключаем наш заголовочный файл со всеми функциями
+#include "Lab1_header_Ushakov.h" 
 
-// F2. Пустое множество?
-bool F2_IsEmpty(Node* head) {
-    return head == nullptr;
-}
+// Используем пространства имен
+using namespace std;
 
-// F3. Проверка принадлежности элемента множеству
-bool F3_IsInSet(Node* head, int value) {
-    if (F2_IsEmpty(head)) { // Используем F2
-        return false;
-    }
-
-    Node* current = head;
-    while (current != nullptr) {
-        if (current->data == value) {
-            return true; // Нашли элемент
-        }
-        current = current->next;
-    }
-    return false; // Не нашли
-}
-
-// F4. Добавление нового элемента в множество
-Node* F4_AddElement(Node* head, int value) {
-    // Множество не хранит дубликаты
-    if (F3_IsInSet(head, value)) { // Используем F3
-        return head; // Элемент уже есть, возвращаем список без изменений
-    }
-
-    // Создаем новый узел
-    Node* newNode = new Node;
-    newNode->data = value;
-    // Добавляем в начало списка
-    newNode->next = head;
-
-    // Новый узел теперь является головой списка
-    return newNode;
-}
-
-// F5. Создание множества
-Node* F5_CreateSet(int count, int minVal, int maxVal) {
-    // Проверка возможности создания (требование)
-    int rangeSize = maxVal - minVal + 1;
-    if (count > rangeSize) {
-        // Невозможно создать множество из 'count' УНИКАЛЬНЫХ элементов
-        // в заданном диапазоне.
-        std::cerr << "Ошибка F5: Невозможно создать множество. "
-            << "Требуемое кол-во (" << count
-            << ") > чем диапазон (" << rangeSize << ")" << std::endl;
-        return F1_CreateEmptySet(); // Возвращаем пустое множество
-    }
-
-    // Настройка генератора случайных чисел
-    // (static, чтобы инициализироваться только один раз)
+// Глобальный генератор для main (чтобы получить размер)
+int GetRandomInt(int minVal, int maxVal) {
     static std::random_device rd;
     static std::mt19937 gen(rd());
     std::uniform_int_distribution<> dist(minVal, maxVal);
-
-    Node* head = F1_CreateEmptySet(); // Начинаем с пустого множества
-    int elementsAdded = 0;
-
-    // Цикл, пока не добавим нужное кол-во УНИКАЛЬНЫХ элементов
-    while (elementsAdded < count) {
-        int randomValue = dist(gen);
-
-        // F4 сама проверит на дубликат (через F3)
-        Node* newHead = F4_AddElement(head, randomValue); // Используем F4
-
-        if (head != newHead) { // Если F4 добавила новый элемент
-            elementsAdded++;
-            head = newHead; // Обновляем голову списка
-        }
-        // Если head == newHead, значит был сгенерирован дубликат,
-        // F4 его не добавила, и elementsAdded не увеличился.
-        // Цикл продолжится.
-    }
-
-    return head;
+    return dist(gen);
 }
 
-// F6. Мощность множества
-int F6_GetPower(Node* head) {
-    if (F2_IsEmpty(head)) { // Используем F2
-        return 0;
-    }
 
-    int count = 0;
-    Node* current = head;
-    while (current != nullptr) {
-        count++;
-        current = current->next;
-    }
-    return count;
-}
+int main() {
+    // Устанавливаем русскую локаль для консоли
+    setlocale(LC_ALL, "Russian");
+    // Устанавливаем вывод true/false вместо 1/0
+    cout << boolalpha;
 
-// F7. Вывод элементов множества в строку
-std::string F7_GetSetAsString(Node* head, char separator) {
-    if (F2_IsEmpty(head)) { // Используем F2
-        return "Множество пустое";
-    }
+    cout << "--- Тестирование функций F9-F14 ---" << endl;
 
-    std::stringstream ss;
-    Node* current = head;
+    // 1. Создание исходных данных
+    int sizeA = GetRandomInt(6, 9);
+    int sizeB = GetRandomInt(6, 9);
 
-    while (current != nullptr) {
-        ss << current->data;
-        // Требование: в конце строки разделитель стоять не должен
-        if (current->next != nullptr) {
-            ss << separator;
-        }
-        current = current->next;
-    }
+    cout << "Генерация множеств A и B..." << endl;
 
-    return ss.str();
-}
+    // Создаем множества (двузначные 10-99)
+    // Диапазоны пересекаются (A: 10-70, B: 50-99), 
+    // чтобы пересечение не было пустым (требование)
+    Node* setA = F5_CreateSet(sizeA, 10, 70);
+    Node* setB = F5_CreateSet(sizeB, 50, 99);
 
-// F8. Удаление множества (очистка памяти)
-Node* F8_DeleteSet(Node* head) {
-    Node* current = head;
-    while (current != nullptr) {
-        Node* temp = current;      // Сохраняем узел для удаления
-        current = current->next; // Переходим к следующему
-        delete temp;             // Освобождаем память
-    }
-    // ВАЖНО: Твой деструктор и DeleteSet в наработках были некорректны,
-    // они не освобождали память (delete), а просто сбрасывали указатели.
+    cout << "Мощность A: " << F6_GetPower(setA) << endl;
+    cout << "Множество A: " << F7_GetSetAsString(setA, ',') << endl;
+    cout << "Мощность B: " << F6_GetPower(setB) << endl;
+    cout << "Множество B: " << F7_GetSetAsString(setB, ',') << endl;
 
-    return nullptr; // Возвращаем NULL, как требует задание
+    // 2. Тестирование
+
+    cout << "\n--- Тест F9 (Подмножество) ---" << endl;
+    cout << "  A является подмножеством B? -> " << F9_IsSubset(setA, setB) << endl;
+    cout << "  A является подмножеством A? -> " << F9_IsSubset(setA, setA) << endl; // Тест A ⊂ A
+
+    cout << "\n--- Тест F10 (Равенство) ---" << endl;
+    cout << "  A равно B? -> " << F10_IsEqual(setA, setB) << endl;
+    cout << "  A равно A? -> " << F10_IsEqual(setA, setA) << endl; // Тест A = A
+
+    cout << "\n--- Тест F11 (Объединение) ---" << endl;
+    Node* setUnion = F11_Union(setA, setB);
+    cout << "  Объединение (A U B): " << F7_GetSetAsString(setUnion, ',') << endl;
+
+    cout << "\n--- Тест F12 (Пересечение) ---" << endl;
+    Node* setInter = F12_Intersection(setA, setB);
+    cout << "  Пересечение (A и B): " << F7_GetSetAsString(setInter, ',') << endl;
+
+    cout << "\n--- Тест F13 (Разность) ---" << endl;
+    // Тест A - B
+    Node* setDiffAB = F13_Difference(setA, setB);
+    cout << "  Разность (A \\ B): " << F7_GetSetAsString(setDiffAB, ',') << endl;
+    // Тест B - A
+    Node* setDiffBA = F13_Difference(setB, setA);
+    cout << "  Разность (B \\ A): " << F7_GetSetAsString(setDiffBA, ',') << endl;
+
+    cout << "\n--- Тест F14 (Симметричная разность) ---" << endl;
+    Node* setSymDiff = F14_SymmetricDifference(setA, setB);
+    // *** ИЗМЕНЕНИЕ ЗДЕСЬ ***
+    cout << "  Симм. разность (A и B): " << F7_GetSetAsString(setSymDiff, ',') << endl;
+
+
+    // 3. Очистка памяти
+    cout << "\n--- Очистка памяти (F8) ---" << endl;
+    setA = F8_DeleteSet(setA);
+    setB = F8_DeleteSet(setB);
+    // Очищаем все множества-результаты
+    setUnion = F8_DeleteSet(setUnion);
+    setInter = F8_DeleteSet(setInter);
+    setDiffAB = F8_DeleteSet(setDiffAB);
+    setDiffBA = F8_DeleteSet(setDiffBA);
+    setSymDiff = F8_DeleteSet(setSymDiff);
+    cout << "Вся память очищена." << endl;
+
+    return 0;
 }
