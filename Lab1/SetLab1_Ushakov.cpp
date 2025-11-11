@@ -4,7 +4,7 @@
 #include <random>       // для генерации размера
 #include <iomanip>      // для boolalpha (вывод true/false)
 
-// Подключаем наш заголовочный файл со всеми функциями
+// Подключаем заголовочный файл со всеми функциями
 #include "Lab1_header_Ushakov.h" 
 
 // Используем пространства имен
@@ -30,14 +30,23 @@ int main() {
     // 1. Создание исходных данных
     int sizeA = GetRandomInt(6, 9);
     int sizeB = GetRandomInt(6, 9);
+    int minRange = 10;
+    int maxRange = 99;
 
     cout << "Генерация множеств A и B..." << endl;
 
     // Создаем множества (двузначные 10-99)
-    // Диапазоны пересекаются (A: 10-70, B: 50-99), 
-    // чтобы пересечение не было пустым (требование)
-    Node* setA = F5_CreateSet(sizeA, 10, 70);
-    Node* setB = F5_CreateSet(sizeB, 50, 99);
+    // Вызываем F5 с правилами
+
+    // В диапазоне [10, 99] есть 10 чисел, кратных 9.
+    // sizeA (6-9) гарантированно помещается.
+    cout << "Создаем A (кратные 9), требуемый размер: " << sizeA << endl;
+    Node* setA = F5_CreateSet(sizeA, minRange, maxRange, 'A');
+
+    // В диапазоне [10, 99] есть 30 чисел, кратных 3.
+    // sizeB (6-9) гарантированно помещается.
+    cout << "Создаем B (кратные 3), требуемый размер: " << sizeB << endl;
+    Node* setB = F5_CreateSet(sizeB, minRange, maxRange, 'B');
 
     cout << "Мощность A: " << F6_GetPower(setA) << endl;
     cout << "Множество A: " << F7_GetSetAsString(setA, ',') << endl;

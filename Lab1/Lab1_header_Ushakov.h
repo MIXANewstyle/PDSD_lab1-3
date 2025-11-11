@@ -25,7 +25,8 @@ bool F3_IsInSet(Node* head, int value);
 Node* F4_AddElement(Node* head, int value);
 
 // F5. Создание множества
-Node* F5_CreateSet(int count, int minVal, int maxVal);
+// Добавлен char setRule: 'A' (кратные 9), 'B' (кратные 3), иначе - любое
+Node* F5_CreateSet(int count, int minVal, int maxVal, char setRule);
 
 // F6. Мощность множества
 int F6_GetPower(Node* head);

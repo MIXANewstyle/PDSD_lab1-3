@@ -1,6 +1,7 @@
 ﻿#include "Lab1_header_Ushakov.h"
 #include <iostream> 
 
+using namespace std;
 
 // F1. Создание пустого множества
 Node* F1_CreateEmptySet() {
@@ -38,29 +39,77 @@ Node* F4_AddElement(Node* head, int value) {
     return newNode;
 }
 
-// F5. Создание множества
-Node* F5_CreateSet(int count, int minVal, int maxVal) {
-    int rangeSize = maxVal - minVal + 1;
-    if (count > rangeSize) {
-        std::cerr << "Ошибка F5: Невозможно создать множество. "
+// F5. Создание множества 
+Node* F5_CreateSet(int count, int minVal, int maxVal, char setRule) {
+
+    // Проверка возможности создания
+    int availableCount = 0;
+    for (int i = minVal; i <= maxVal; ++i) {
+        if (setRule == 'A' && i % 9 == 0) {
+            availableCount++;
+        }
+        else if (setRule == 'B' && i % 3 == 0) {
+            availableCount++;
+        }
+        else if (setRule != 'A' && setRule != 'B') {
+            availableCount++; // Общий случай (любое число)
+        }
+    }
+
+    // Если в заданном диапазоне нет 'availableCount' чисел по правилу,
+    // то создать множество из 'count' УНИКАЛЬНЫХ элементов невозможно.
+    if (count > availableCount) {
+        cerr << "Ошибка F5: Невозможно создать множество. "
             << "Требуемое кол-во (" << count
-            << ") > чем диапазон (" << rangeSize << ")" << std::endl;
+            << ") > чем доступно по правилу (" << availableCount << ")" << std::endl;
         return F1_CreateEmptySet();
     }
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dist(minVal, maxVal);
+
+    // Настройка генератора
+    static random_device rd;
+    static mt19937 gen(rd());
+    uniform_int_distribution<> dist(minVal, maxVal);
 
     Node* head = F1_CreateEmptySet();
     int elementsAdded = 0;
-    while (elementsAdded < count) {
+
+    // Цикл генерации
+    // Добавим защиту от слишком долгого поиска
+    int maxAttempts = count * 150 + 1000; // Попыток, чтобы найти числа
+    int attempts = 0;
+
+    while (elementsAdded < count && attempts < maxAttempts) {
         int randomValue = dist(gen);
-        Node* newHead = F4_AddElement(head, randomValue); // Используем F4
-        if (head != newHead) {
-            elementsAdded++;
-            head = newHead;
+        attempts++;
+
+        // Проверяем, подходит ли число по правилу
+        bool passesRule = false;
+        if (setRule == 'A') {
+            passesRule = (randomValue % 9 == 0);
+        }
+        else if (setRule == 'B') {
+            passesRule = (randomValue % 3 == 0);
+        }
+        else {
+            passesRule = true; // Любое число подходит
+        }
+
+        // Если подошло, пытаемся добавить (F4 проверит на дубликат)
+        if (passesRule) {
+            Node* newHead = F4_AddElement(head, randomValue);
+            if (head != newHead) { // F4 добавила новый элемент
+                elementsAdded++;
+                head = newHead;
+            }
         }
     }
+
+    if (attempts >= maxAttempts && elementsAdded < count) {
+        cerr << "Предупреждение F5: Превышено кол-во попыток. "
+            << "Множество может быть неполным (создано "
+            << elementsAdded << " из " << count << ")." << endl;
+    }
+
     return head;
 }
 
