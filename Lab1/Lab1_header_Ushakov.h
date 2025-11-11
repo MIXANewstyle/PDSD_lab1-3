@@ -1,65 +1,68 @@
 ﻿#pragma once
 
-// Подключаем необходимые библиотеки для реализации
-#include <string>       
-#include <sstream>      
-#include <random>       
+#include <string>
+#include <sstream>
+#include <random>
 
-// Структура для узла односвязного списка
+// Структура для узла (остается без изменений)
 struct Node {
-    int data;       // Полезная информация (значение элемента)
-    Node* next;     // Указатель на следующий узел
+    int data;
+    Node* next;
 };
 
+// Класс "Множество"
+class MySet {
+private:
+    // --- Параметр класса ---
+    Node* _head; // Указатель на голову списка
 
-// F1. Создание пустого множества
-Node* F1_CreateEmptySet();
+    // --- Вспомогательный метод (нужен для F5) ---
+    int getRandomInt(int minVal, int maxVal);
 
-// F2. Пустое множество?
-bool F2_IsEmpty(Node* head);
+public:
+    // --- Методы класса (F1-F14) ---
 
-// F3. Проверка принадлежности элемента множеству
-bool F3_IsInSet(Node* head, int value);
+    // F1. Конструктор по умолчанию (создание пустого множества)
+    MySet();
 
-// F4. Добавление нового элемента в множество
-Node* F4_AddElement(Node* head, int value);
+    // F5. Параметризованный конструктор (создание множества)
+    MySet(int count, int minVal, int maxVal, char setRule = ' ');
 
-// F5. Создание множества
-// Добавлен char setRule: 'A' (кратные 9), 'B' (кратные 3), иначе - любое
-Node* F5_CreateSet(int count, int minVal, int maxVal, char setRule);
+    // F8. Деструктор (удаление множества)
+    ~MySet();
 
-// F6. Мощность множества
-int F6_GetPower(Node* head);
+    // F2. Пустое множество? (const - не изменяет объект)
+    bool IsEmpty() const;
 
-// F7. Вывод элементов множества в строку
-std::string F7_GetSetAsString(Node* head, char separator);
+    // F3. Проверка принадлежности (const - не изменяет объект)
+    bool IsInSet(int value) const;
 
-// F8. Удаление множества (очистка памяти)
-Node* F8_DeleteSet(Node* head);
+    // F4. Добавление элемента
+    // (Возвращает bool, чтобы F5 мог понять, был ли элемент добавлен)
+    bool AddElement(int value);
 
+    // F6. Мощность множества (const - не изменяет объект)
+    int GetPower() const;
 
-//   (Лабораторная 2) 
+    // F7. Вывод в строку (const - не изменяет объект)
+    std::string GetSetAsString(char separator) const;
 
-// F9. Подмножество (A является подмножеством B?)
-// (Использует F2, F3)
-bool F9_IsSubset(Node* headA, Node* headB);
+    // F9. Подмножество? (const - не изменяет 'this')
+    bool IsSubset(const MySet& otherSet) const;
 
-// F10. Равенство двух множеств (A == B?)
-// (Использует F9)
-bool F10_IsEqual(Node* headA, Node* headB);
+    // F10. Равенство? (const - не изменяет 'this')
+    bool IsEqual(const MySet& otherSet) const;
 
-// F11. Объединение двух множеств (A U B)
-// (Использует F2, F4)
-Node* F11_Union(Node* headA, Node* headB);
+    // F11. Объединение (const - не изменяет 'this' и 'otherSet')
+    // Возвращает НОВЫЙ объект MySet
+    MySet Union(const MySet& otherSet) const;
 
-// F12. Пересечение двух множеств (A ∩ B)
-// (Использует F2, F4, F3)
-Node* F12_Intersection(Node* headA, Node* headB);
+    // F12. Пересечение (const)
+    MySet Intersection(const MySet& otherSet) const;
 
-// F13. Разность множеств (A \ B)
-// (Использует F2, F4, F3)
-Node* F13_Difference(Node* headA, Node* headB);
+    // F13. Разность (const)
+    MySet Difference(const MySet& otherSet) const;
 
-// F14. Симметричная разность (A Δ B)
-// (Использует F11, F12, F13)
-Node* F14_SymmetricDifference(Node* headA, Node* headB);
+    // F14. Симметричная разность (const)
+    MySet SymmetricDifference(const MySet& otherSet) const;
+};

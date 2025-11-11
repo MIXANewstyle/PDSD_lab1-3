@@ -4,10 +4,9 @@
 #include <random>       // для генерации размера
 #include <iomanip>      // для boolalpha (вывод true/false)
 
-// Подключаем заголовочный файл со всеми функциями
+// Подключаем заголовочный файл
 #include "Lab1_header_Ushakov.h" 
 
-// Используем пространства имен
 using namespace std;
 
 // Глобальный генератор для main (чтобы получить размер)
@@ -20,81 +19,70 @@ int GetRandomInt(int minVal, int maxVal) {
 
 
 int main() {
-    // Устанавливаем русскую локаль для консоли
     setlocale(LC_ALL, "Russian");
-    // Устанавливаем вывод true/false вместо 1/0
     cout << boolalpha;
 
-    cout << "--- Тестирование функций F9-F14 ---" << endl;
+    cout << "--- Тестирование класса MySet (ООП) ---" << endl;
 
-    // 1. Создание исходных данных
+    // 1. Создание исходных данных (Тест F5)
     int sizeA = GetRandomInt(6, 9);
     int sizeB = GetRandomInt(6, 9);
     int minRange = 10;
     int maxRange = 99;
 
-    cout << "Генерация множеств A и B..." << endl;
+    cout << "Генерация множеств A и B (диапазон ["
+        << minRange << ", " << maxRange << "])..." << endl;
 
-    // Создаем множества (двузначные 10-99)
-    // Вызываем F5 с правилами
-
-    // В диапазоне [10, 99] есть 10 чисел, кратных 9.
-    // sizeA (6-9) гарантированно помещается.
     cout << "Создаем A (кратные 9), требуемый размер: " << sizeA << endl;
-    Node* setA = F5_CreateSet(sizeA, minRange, maxRange, 'A');
+    // Вызываем F5 (параметризованный конструктор)
+    MySet setA(sizeA, minRange, maxRange, 'A');
 
-    // В диапазоне [10, 99] есть 30 чисел, кратных 3.
-    // sizeB (6-9) гарантированно помещается.
     cout << "Создаем B (кратные 3), требуемый размер: " << sizeB << endl;
-    Node* setB = F5_CreateSet(sizeB, minRange, maxRange, 'B');
+    MySet setB(sizeB, minRange, maxRange, 'B');
 
-    cout << "Мощность A: " << F6_GetPower(setA) << endl;
-    cout << "Множество A: " << F7_GetSetAsString(setA, ',') << endl;
-    cout << "Мощность B: " << F6_GetPower(setB) << endl;
-    cout << "Множество B: " << F7_GetSetAsString(setB, ',') << endl;
 
-    // 2. Тестирование
+    // 2. Тестирование (F6, F7)
+    cout << "\n--- Тест F6 (Мощность) и F7 (Вывод) ---" << endl;
+    cout << "Мощность A: " << setA.GetPower() << endl; // F6
+    cout << "Множество A: " << setA.GetSetAsString(',') << endl; // F7
+    cout << "Мощность B: " << setB.GetPower() << endl; // F6
+    cout << "Множество B: " << setB.GetSetAsString(',') << endl; // F7
+
+    // 3. Тестирование операций
 
     cout << "\n--- Тест F9 (Подмножество) ---" << endl;
-    cout << "  A является подмножеством B? -> " << F9_IsSubset(setA, setB) << endl;
-    cout << "  A является подмножеством A? -> " << F9_IsSubset(setA, setA) << endl; // Тест A ⊂ A
+    cout << "  A является подмножеством B? -> " << setA.IsSubset(setB) << endl;
+    cout << "  A является подмножеством A? -> " << setA.IsSubset(setA) << endl;
 
     cout << "\n--- Тест F10 (Равенство) ---" << endl;
-    cout << "  A равно B? -> " << F10_IsEqual(setA, setB) << endl;
-    cout << "  A равно A? -> " << F10_IsEqual(setA, setA) << endl; // Тест A = A
+    cout << "  A равно B? -> " << setA.IsEqual(setB) << endl;
+    cout << "  A равно A? -> " << setA.IsEqual(setA) << endl;
 
     cout << "\n--- Тест F11 (Объединение) ---" << endl;
-    Node* setUnion = F11_Union(setA, setB);
-    cout << "  Объединение (A U B): " << F7_GetSetAsString(setUnion, ',') << endl;
+    // Создаем объект-результат
+    MySet setUnion = setA.Union(setB);
+    cout << "  Объединение (A U B): " << setUnion.GetSetAsString(',') << endl;
 
     cout << "\n--- Тест F12 (Пересечение) ---" << endl;
-    Node* setInter = F12_Intersection(setA, setB);
-    cout << "  Пересечение (A и B): " << F7_GetSetAsString(setInter, ',') << endl;
+    MySet setInter = setA.Intersection(setB);
+    cout << "  Пересечение (A и B): " << setInter.GetSetAsString(',') << endl;
 
     cout << "\n--- Тест F13 (Разность) ---" << endl;
-    // Тест A - B
-    Node* setDiffAB = F13_Difference(setA, setB);
-    cout << "  Разность (A \\ B): " << F7_GetSetAsString(setDiffAB, ',') << endl;
-    // Тест B - A
-    Node* setDiffBA = F13_Difference(setB, setA);
-    cout << "  Разность (B \\ A): " << F7_GetSetAsString(setDiffBA, ',') << endl;
+    MySet setDiffAB = setA.Difference(setB);
+    cout << "  Разность (A \\ B): " << setDiffAB.GetSetAsString(',') << endl;
+    MySet setDiffBA = setB.Difference(setA);
+    cout << "  Разность (B \\ A): " << setDiffBA.GetSetAsString(',') << endl;
 
     cout << "\n--- Тест F14 (Симметричная разность) ---" << endl;
-    Node* setSymDiff = F14_SymmetricDifference(setA, setB);
-    cout << "  Симм. разность (A и B): " << F7_GetSetAsString(setSymDiff, ',') << endl;
+    MySet setSymDiff = setA.SymmetricDifference(setB);
+    cout << "  Симм. разность (A и B): " << setSymDiff.GetSetAsString(',') << endl;
 
 
-    // 3. Очистка памяти
-    cout << "\n--- Очистка памяти (F8) ---" << endl;
-    setA = F8_DeleteSet(setA);
-    setB = F8_DeleteSet(setB);
-    // Очищаем все множества-результаты
-    setUnion = F8_DeleteSet(setUnion);
-    setInter = F8_DeleteSet(setInter);
-    setDiffAB = F8_DeleteSet(setDiffAB);
-    setDiffBA = F8_DeleteSet(setDiffBA);
-    setSymDiff = F8_DeleteSet(setSymDiff);
-    cout << "Вся память очищена." << endl;
+    // 4. Тестирование F8 (Деструктор)
+    cout << "\n--- Тест F8 (Очистка памяти) ---" << endl;
+    cout << "Завершение main()..." << endl;
+    cout << "Деструкторы для setA, setB, setUnion, setInter, setDiffAB, "
+        << "setDiffBA, setSymDiff будут вызваны АВТОМАТИЧЕСКИ." << endl;
 
-    return 0;
+    return 0; // <--- В ЭТОЙ ТОЧКЕ СРАБОТАЕТ ~MySet() (F8) ДЛЯ ВСЕХ ОБЪЕКТОВ
 }
